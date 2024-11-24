@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Weather App</title>
+    <!-- <link rel="stylesheet" href="style.css"> -->
+<style>
+
+body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            background: linear-gradient(135deg, #89f7fe, #66a6ff);
+        }
+        
+        .container {
+            background: linear-gradient(123deg, #0a96a0, #063577);
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            width: 90%;
+            max-width: 400px;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        label {
+            display: block;
+            font-size: 1rem;
+            margin-bottom: 10px;
+            color: #ddd;
+        }
+        
+        input[type="text"] {
+            width: 80%;
+            padding: 10px 15px;
+            font-size: 1rem;
+            border-color: #ced5d4;
+            border-radius: 8px;
+            outline: none;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        input[type="text"]::placeholder {
+            color: #efeded;
+        }
+        
+        button {
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            color: #fff;
+            font-size: 1rem;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        #result {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .weather-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            width: 120px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .weather-box img {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 5px;
+        }
+
+        .weather-box p {
+            margin: 0;
+            font-size: 1rem;
+            color: #fff;
+        }
+
+
+</style>
+
+
+</head>
+
+<body>
+    <!-- <div class="container">
+    
+    <h1>Weather App</h1>
+    <label for="cityName">City Name : </label>
+    <input type="text" placeholder ="Enter city name" id="cityName">
+   <br><br>
+    <button onclick="getWether()">submit</button>
+
+    <div id="result">
+    <div id="icon"></div>
+</div>
+</div> --> -->
+<div class="container">
+    <h1>Weather App</h1>
+    <label for="cityName">Enter City Name </label>
+    <input type="text" id="cityName" placeholder="E.g, London">
+    <button onclick="getWether()">Get Weather</button>
+
+    <div id="clock"></div>
+    <div id="result"></div>
+</div>
+
+
+
+<!-- <img src="https://openweathermap.org/img/wn/01n@2x.png" alt=""> -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+
+
+
+        setInterval(function () {
+                
+        }, 1000);
+
+
+
+
+        function getWether() {
+            let city = document.querySelector("#cityName").value
+            let API_key = "b1e7104bf6b72d938b8a141b84256986"
+
+            if (!city) {
+                document.querySelector("#result").innerHTML = `
+                    <p>Please enter a valid city name.</p>
+                `;
+            }
+
+
+
+            axios.get(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_key}&units=metric`)
+                .then(function (response) {
+                    // handle success
+
+                    const { temp, feels_like, humidity } = response.data.main;
+                    const { description, icon } = response.data.weather[0];
+                    const { speed: windSpeed } = response.data.wind;
+
+
+
+                    // Update Weather Details
+                    document.querySelector("#result").innerHTML = `
+                        <div class="weather-box">
+                            <img src="https://openweathermap.org/img/wn/${icon}@2x.png" alt="Weather icon">
+                            <p>${city}</p>
+                            <p>${temp}°C</p>
+                        </div>
+                        <div class="weather-box">
+                            <img src="https://cdn-icons-png.flaticon.com/512/1146/1146869.png" alt="Feels Like">
+                            <p>Feels Like</p>
+                            <p>${feels_like}°C</p>
+                        </div>
+                        <div class="weather-box">
+                            <img src="https://cdn-icons-png.flaticon.com/512/727/727790.png" alt="Humidity">
+                            <p>Humidity</p>
+                            <p>${humidity}%</p>
+                        </div>
+                        <div class="weather-box">
+                            <img src="https://cdn-icons-png.flaticon.com/512/4151/4151022.png" alt="Wind Speed">
+                            <p>Wind Speed</p>
+                            <p>${windSpeed} m/s</p>
+                        </div>
+                    `;
+
+
+
+
+
+
+                    // console.log(response);
+                    // // document.querySelector("#icon").innerHTML = `https://openweathermap.org/img/wn/${response.data.weather[0].icon}@2x.png`
+                    // document.querySelector("#icon").innerHTML = `This is the weather of ${city} city ${response.data.weather[0].icon} ° C`
+                    // document.querySelector("#result").innerHTML = `This is the weather of ${city}  ${response.data.main.temp} ° C`
+                })
+                
+                .catch(function (error) {
+                    // handle error
+                    document.querySelector("#result").innerHTML = `
+
+                    <p>City not found. Try again.</p>`;
+                    
+
+                    console.log(error.message);
+                })
+        }
+    </script>
+</body>
+
+</html>
