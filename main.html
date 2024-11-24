@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather App with City Clock</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>Weather App</h1>
+      <label for="cityName">Enter City Name </label>
+      <input type="text" id="cityName" placeholder="E.g., London" />
+      <button onclick="getWeather()">Get Weather</button>
+
+      <!-- City Clock -->
+      <div id="clock"></div>
+
+      <!-- Weather Result -->
+      <div id="result"></div>
+    </div>
+
+    <!-- Importing Axios and Moment.js -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+
+    <script>
+      let clockInterval;
+
+      function getWeather() {
+        const city = document.querySelector("#cityName").value;
+        const API_key = "b1e7104bf6b72d938b8a141b84256986";
+
+        if (!city) {
+          document.querySelector("#result").innerHTML = `
+            <p>Please enter a valid city name.</p>
+          `;
+          return;
+        }
+
+        axios
+          .get(
+            `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_key}&units=metric`
+          )
+          .then(function (response) {
+            // Extract Weather and Time Zone Information
+            const { temp, feels_like, humidity } = response.data.main;
+            const { description, icon } = response.data.weather[0];
+            const { speed: windSpeed } = response.data.wind;
+            const timezone = response.data.timezone;
+
+            // Update Weather Details
+            document.querySelector("#result").innerHTML = `
+              <div class="weather-box">
+                <img src="https://openweathermap.org/img/wn/${icon}@2x.png" alt="Weather icon">
+                <p>${city}</p>
+                <p>${temp}°C</p>
+              </div>
+              <div class="weather-box">
+                <img src="https://cdn-icons-png.flaticon.com/512/1146/1146869.png" alt="Feels Like">
+                <p>Feels Like</p>
+                <p>${feels_like}°C</p>
+              </div>
+              <div class="weather-box">
+                <img src="https://cdn-icons-png.flaticon.com/512/727/727790.png" alt="Humidity">
+                <p>Humidity</p>
+                <p>${humidity}%</p>
+              </div>
+              <div class="weather-box">
+                <img src="https://cdn-icons-png.flaticon.com/512/4151/4151022.png" alt="Wind Speed">
+                <p>Wind Speed</p>
+                <p>${windSpeed} m/s</p>
+              </div>
+            `;
+
+            // Start Clock for the City's Time Zone
+            updateCityClock(timezone);
+          })
+          .catch(function (error) {
+            // Handle Error
+            document.querySelector("#result").innerHTML = `
+              <p>City not found. Try again.</p>
+            `;
+            console.log(error.message);
+          });
+      }
+
+      function updateCityClock(timezone) {
+        // Clear previous interval to prevent multiple clocks
+        if (clockInterval) {
+          clearInterval(clockInterval);
+        }
+
+        // Update clock every second
+        clockInterval = setInterval(function () {
+          // Calculate city time using timezone offset in seconds
+          const cityTime = moment().utcOffset(timezone / 60).format("dddd, MMMM Do YYYY, h:mm:ss A");
+          document.querySelector("#clock").innerHTML = `
+            <p> This city Local Time: ${cityTime}</p>
+          `;
+        }, 1000);
+      }
+    </script>
+  </body>
+</html>
